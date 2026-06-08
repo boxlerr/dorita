@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
+/* ============================================================
+   DORITA — Identidad visual
+   Vintage-feminine / heritage editorial
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette */
+  --cream: #f4ecdf;
+  --cream-deep: #ebdfca;
+  --cream-soft: #f9f3e9;
+  --oxblood: #6e1d1d;
+  --oxblood-deep: #531414;
+  --brick: #9a3b2c;
+  --blush: #e7cdc4;
+  --olive: #5d5d3e;
+  --gold: #b18a4e;
+  --gold-soft: #c8a877;
+  --ink: #2a1812;
+  --ink-soft: #5a463c;
+  --navy: #243a55;
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+
+  /* Layout */
+  --maxw: 1240px;
+  --gutter: clamp(1.25rem, 4vw, 4rem);
 }
 
 @theme inline {
+  --color-cream: var(--cream);
+  --color-cream-deep: var(--cream-deep);
+  --color-cream-soft: var(--cream-soft);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-deep: var(--oxblood-deep);
+  --color-brick: var(--brick);
+  --color-blush: var(--blush);
+  --color-olive: var(--olive);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-display: var(--font-cormorant);
+  --font-script: var(--font-script);
+  --font-sans: var(--font-jost);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--oxblood);
+  color: var(--cream-soft);
+}
+
+/* ---------- Typographic helpers ---------- */
+.font-script {
+  font-family: var(--font-script), "Brush Script MT", cursive;
+  font-weight: 400;
+}
+.font-sans-ui {
+  font-family: var(--font-jost), "Helvetica Neue", Arial, sans-serif;
+}
+
+.eyebrow {
+  font-family: var(--font-jost), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Layout primitives ---------- */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section {
+  padding-block: clamp(4.5rem, 9vw, 8.5rem);
+}
+
+/* ---------- Buttons ----------
+   Kept in the components layer so Tailwind utilities (e.g. `hidden`,
+   `md:inline-flex`) can still override `display` for responsive control. */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: var(--font-jost), sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 0.95em 1.9em;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    cursor: pointer;
+    transition: background-color 0.35s ease, color 0.35s ease, transform 0.35s ease;
+    text-decoration: none;
+  }
+  .btn-solid {
+    background: var(--oxblood);
+    color: var(--cream-soft);
+    border-color: var(--oxblood);
+  }
+  .btn-solid:hover {
+    background: var(--oxblood-deep);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--oxblood);
+  }
+  .btn-ghost:hover {
+    background: var(--oxblood);
+    color: var(--cream-soft);
+  }
+}
+
+/* ---------- Decorative: harlequin band ---------- */
+.harlequin {
+  height: 26px;
+  background-image:
+    linear-gradient(135deg, var(--oxblood) 25%, transparent 25%),
+    linear-gradient(225deg, var(--oxblood) 25%, transparent 25%),
+    linear-gradient(45deg, var(--oxblood) 25%, transparent 25%),
+    linear-gradient(315deg, var(--oxblood) 25%, transparent 25%);
+  background-position: 13px 0, 13px 0, 0 0, 0 0;
+  background-size: 26px 26px;
+  background-repeat: repeat;
+  opacity: 0.9;
+}
+
+/* ---------- Hairline rule ---------- */
+.rule {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+/* ---------- Stone swatch (catalog) ---------- */
+.stone-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 50% / 46%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow:
+    inset 0 0 0 6px color-mix(in srgb, var(--cream-soft) 70%, transparent),
+    inset 0 0 0 7px color-mix(in srgb, var(--gold) 40%, transparent);
+}
+.stone-frame::after {
+  /* glossy highlight */
+  content: "";
+  position: absolute;
+  top: 8%;
+  left: 14%;
+  width: 42%;
+  height: 30%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), transparent);
+  filter: blur(4px);
+  border-radius: 50%;
+}
+
+/* reveal-on-load fade */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise { animation: none; }
 }
