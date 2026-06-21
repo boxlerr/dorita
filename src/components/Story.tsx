@@ -1,62 +1,62 @@
+import Image from "next/image";
 import { Flourish } from "./Ornaments";
+import { storyPhoto } from "@/data/media";
 
 export default function Story() {
   return (
-    <section id="origen" className="section" style={{ background: "var(--cream)" }}>
+    <section id="historia" className="section" style={{ background: "var(--cream)" }}>
       <div className="container">
-        <div className="grid gap-12 md:gap-16 md:grid-cols-12 items-start">
-          <div className="md:col-span-5">
-            <p className="eyebrow text-brick mb-6">Origen / Historia</p>
+        <div className="grid items-center gap-12 md:grid-cols-12 md:gap-16">
+          {/* Texto protagonista */}
+          <div className="md:col-span-7">
+            <p className="eyebrow text-brick mb-6">La historia</p>
             <h2
               className="font-display text-oxblood"
-              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.2rem)", lineHeight: 1 }}
+              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.4rem)", lineHeight: 1 }}
             >
-              Un legado femenino que se hereda
+              Un legado que se hereda
             </h2>
-            <Flourish className="text-gold w-40 mt-8" />
-          </div>
+            <Flourish className="text-gold w-40 mt-7 mb-9" />
 
-          <div className="md:col-span-7">
             <div
               className="space-y-6 text-ink-soft"
               style={{ fontSize: "1.2rem", lineHeight: 1.62 }}
             >
               <p>
-                Dorita encuentra su origen en la abuela de su fundadora: una mujer
-                que entendía el arreglo personal como una forma de{" "}
-                <em className="text-oxblood">expresión cotidiana</em>.
+                Antes de las ciudades, antes de la escritura, alguien eligió
+                ponerse algo encima que no servía para abrigarse ni para comer.
+                Ese fue el primer acto de identidad.
               </p>
               <p>
-                Esa referencia se vincula con los objetos y adornos como elementos
-                de <strong className="font-medium text-ink">identidad, memoria y expresión personal</strong>.
-                Accesorios, detalles y rituales son símbolos de un legado que se
-                transmite entre generaciones, construyendo vínculos, relatos y
-                formas de reconocerse a una misma.
+                Durante siglos, las joyas fueron algo que otros ponían sobre la
+                mujer — dote, símbolo, posesión. Hasta que algo se dio vuelta: la
+                mujer empezó a elegirlas para sí misma, por el placer de
+                arreglarse, sin esperar una ocasión.
               </p>
               <p>
-                No son piezas armadas de fábrica. La combinación de cada una está
-                pensada y elegida — una alternativa a las lógicas del consumo
-                efímero, una invitación a conservar aquello que tiene significado.
+                Dorita nace de eso. Y de la belleza que no busca ser perfecta: la{" "}
+                <em className="text-oxblood">piedra natural</em>, con sus vetas,
+                sus marcas, su forma irrepetible, que se vuelve parte de vos.
+              </p>
+              <p className="font-display italic text-ink" style={{ fontSize: "1.45rem" }}>
+                Cada pieza tiene su propia historia.
               </p>
             </div>
-
-            <dl className="mt-12 grid grid-cols-3 gap-6 border-t pt-8" style={{ borderColor: "color-mix(in srgb, var(--ink) 14%, transparent)" }}>
-              {[
-                { k: "Memoria", v: "Herencia y permanencia" },
-                { k: "Expresión", v: "Identidad y sensibilidad" },
-                { k: "Afecto", v: "Lo que se transmite" },
-              ].map((it) => (
-                <div key={it.k}>
-                  <dt className="font-display text-oxblood" style={{ fontSize: "1.5rem" }}>
-                    {it.k}
-                  </dt>
-                  <dd className="font-sans-ui text-ink-soft mt-1" style={{ fontSize: "0.8rem", letterSpacing: "0.04em" }}>
-                    {it.v}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
+
+          {/* Imagen al costado */}
+          <figure className="md:col-span-5">
+            <div className="img-frame" style={{ aspectRatio: "4 / 5" }}>
+              <Image
+                src={storyPhoto.img}
+                alt={storyPhoto.alt}
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                placeholder="blur"
+                className="object-cover"
+              />
+            </div>
+          </figure>
         </div>
       </div>
     </section>

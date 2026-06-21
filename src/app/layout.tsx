@@ -27,25 +27,27 @@ const pinyon = Pinyon_Script({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dorita.vercel.app"),
   title: {
-    default: "Dorita — Accesorios atemporales con piedras naturales",
-    template: "%s — Dorita",
+    default: "Dorita Atelier — Accesorios con piedras naturales",
+    template: "%s — Dorita Atelier",
   },
   description:
-    "Dorita crea accesorios atemporales con piedras naturales, donde ninguna pieza es igual a otra. La coquetería como un pequeño acto diario de identidad que se transmite entre mujeres.",
+    "Dorita Atelier crea accesorios con piedras naturales, hechos a mano: ninguna pieza es igual a otra. La coquetería como un pequeño acto diario de identidad.",
   keywords: [
     "accesorios",
     "piedras naturales",
     "joyería artesanal",
-    "regalos significativos",
-    "Dorita",
+    "dijes",
+    "collares",
+    "Dorita Atelier",
+    "Argentina",
   ],
   openGraph: {
-    title: "Dorita — Accesorios atemporales con piedras naturales",
+    title: "Dorita Atelier — Accesorios con piedras naturales",
     description:
-      "Piezas únicas con piedras naturales. Memoria, expresión y afecto en cada detalle.",
+      "Piezas únicas con piedras naturales, hechas a mano. Cápsula flowers: Antonia, Josefa, Nora y Elsa.",
     type: "website",
     locale: "es_AR",
-    siteName: "Dorita",
+    siteName: "Dorita Atelier",
   },
 };
 

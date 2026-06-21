@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const links = [
-  { href: "#origen", label: "Origen" },
-  { href: "#valores", label: "Valores" },
-  { href: "#coleccion", label: "Colección" },
-  { href: "#filosofia", label: "Filosofía" },
-  { href: "#contacto", label: "Contacto" },
-];
+import { nav as links } from "@/data/site";
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);

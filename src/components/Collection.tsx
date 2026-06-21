@@ -1,96 +1,78 @@
-"use client";
-
-import { useState } from "react";
-import { categories, pieces, type Category } from "@/data/pieces";
+import Image from "next/image";
+import PiecesGallery from "./PiecesGallery";
+import { categories } from "@/data/catalog";
 
 export default function Collection() {
-  const [active, setActive] = useState<(typeof categories)[number]>("Todas");
-
-  const shown =
-    active === "Todas"
-      ? pieces
-      : pieces.filter((p) => p.category === (active as Category));
-
   return (
-    <section id="coleccion" className="section" style={{ background: "var(--cream)" }}>
+    <section id="piezas" className="section" style={{ background: "var(--cream-soft)" }}>
       <div className="container">
         <div className="flex flex-col items-center text-center">
-          <p className="eyebrow text-brick mb-6">Colección</p>
+          <p className="eyebrow text-brick mb-6">Las piezas</p>
           <h2
             className="font-display text-oxblood"
             style={{ fontSize: "clamp(2.6rem, 7vw, 5rem)", lineHeight: 0.98 }}
           >
-            Cada piedra, una historia
+            Cápsula flowers
           </h2>
           <p className="mt-5 max-w-xl text-ink-soft" style={{ fontSize: "1.15rem" }}>
-            Piezas únicas con piedras naturales. Una muestra de nuestro catálogo
-            — escribinos para conocer disponibilidad y combinaciones.
+            Piezas únicas con piedras naturales. Cada combinación está pensada y
+            elegida a mano — ninguna es igual a otra.
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
-          {categories.map((c) => {
-            const on = c === active;
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setActive(c)}
-                className="font-sans-ui rounded-full px-5 py-2 transition-colors"
-                style={{
-                  fontSize: "0.74rem",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  fontWeight: 500,
-                  border: "1px solid color-mix(in srgb, var(--oxblood) 45%, transparent)",
-                  background: on ? "var(--oxblood)" : "transparent",
-                  color: on ? "var(--cream-soft)" : "var(--oxblood)",
-                }}
-              >
-                {c}
-              </button>
-            );
-          })}
+        {/* Álbum: polaroids sobre lino con tilts y masking tape. Click → lightbox. */}
+        <p
+          className="font-sans-ui mt-9 text-center text-ink-soft"
+          style={{ fontSize: "0.7rem", letterSpacing: "0.28em", textTransform: "uppercase" }}
+        >
+          · El álbum · tocá una foto para verla en grande ·
+        </p>
+        <PiecesGallery />
+
+        {/* Las cuatro categorías */}
+        <div className="mt-24 flex flex-col items-center text-center">
+          <p className="eyebrow text-brick mb-4">Las cuatro categorías</p>
+          <p className="max-w-lg text-ink-soft" style={{ fontSize: "1.08rem" }}>
+            Cada línea lleva nombre de mujer. De lo que se usa todos los días a lo
+            que se guarda para los días que piden un poco más.
+          </p>
         </div>
 
-        {/* Grid */}
-        <div className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {shown.map((p) => (
-            <article key={p.id} className="group flex flex-col">
-              <div className="relative">
-                <div className="stone-frame" style={{ background: p.gradient }} />
+        <div className="mt-12 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.map((c) => (
+            <article key={c.name} className="group flex flex-col">
+              <div className="img-frame" style={{ aspectRatio: "4 / 5" }}>
+                <Image
+                  src={c.photo.img}
+                  alt={c.photo.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  placeholder="blur"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
                 <span
-                  className="absolute -top-2 -right-1 font-sans-ui rounded-full px-3 py-1"
+                  className="absolute left-3 top-3 font-sans-ui rounded-full px-3 py-1"
                   style={{
                     fontSize: "0.58rem",
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.18em",
                     textTransform: "uppercase",
-                    background: "var(--cream-soft)",
+                    background: "color-mix(in srgb, var(--cream-soft) 88%, transparent)",
                     color: "var(--brick)",
                     border: "1px solid color-mix(in srgb, var(--gold) 55%, transparent)",
                   }}
                 >
-                  Pieza única
+                  {c.line}
                 </span>
               </div>
 
-              <div className="mt-5 flex items-baseline justify-between gap-3">
-                <h3 className="font-display text-ink" style={{ fontSize: "1.7rem", lineHeight: 1 }}>
-                  {p.name}
-                </h3>
-                <span
-                  className="font-sans-ui text-ink-soft"
-                  style={{ fontSize: "0.66rem", letterSpacing: "0.12em", textTransform: "uppercase" }}
-                >
-                  {p.category}
-                </span>
-              </div>
-              <p className="font-sans-ui text-brick mt-1" style={{ fontSize: "0.78rem", letterSpacing: "0.04em" }}>
-                {p.stone}
-              </p>
-              <p className="mt-3 text-ink-soft" style={{ fontSize: "1.02rem", lineHeight: 1.55 }}>
-                {p.note}
+              <h3
+                className="font-display text-ink mt-5"
+                style={{ fontSize: "1.9rem", lineHeight: 1 }}
+              >
+                {c.name}
+              </h3>
+              <p className="mt-2 text-ink-soft" style={{ fontSize: "1.02rem", lineHeight: 1.5 }}>
+                {c.blurb}
               </p>
             </article>
           ))}

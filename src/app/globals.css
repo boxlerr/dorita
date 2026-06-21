@@ -167,28 +167,265 @@ h1, h2, h3, h4 {
   border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
-/* ---------- Stone swatch (catalog) ---------- */
-.stone-frame {
+/* ---------- Image frame (editorial, soft gold rule) ---------- */
+.img-frame {
   position: relative;
-  aspect-ratio: 4 / 5;
-  border-radius: 50% / 46%;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  border-radius: 3px;
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
   box-shadow:
-    inset 0 0 0 6px color-mix(in srgb, var(--cream-soft) 70%, transparent),
-    inset 0 0 0 7px color-mix(in srgb, var(--gold) 40%, transparent);
+    inset 0 0 0 5px color-mix(in srgb, var(--cream-soft) 55%, transparent),
+    0 26px 52px -30px color-mix(in srgb, var(--ink) 65%, transparent);
 }
-.stone-frame::after {
-  /* glossy highlight */
-  content: "";
+
+/* ============================================================
+   Álbum "Cápsula flowers" — polaroids sobre lino + lightbox
+   ============================================================ */
+
+/* Textura sutil de lino para el fondo del álbum. */
+.album-bed {
+  position: relative;
+  background-color: var(--cream-soft);
+  background-image:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--ink) 3%, transparent) 0,
+      color-mix(in srgb, var(--ink) 3%, transparent) 1px,
+      transparent 1px, transparent 3px),
+    repeating-linear-gradient(-45deg,
+      color-mix(in srgb, var(--ink) 2.5%, transparent) 0,
+      color-mix(in srgb, var(--ink) 2.5%, transparent) 1px,
+      transparent 1px, transparent 4px);
+}
+
+/* Mobile (≤640px): carrusel horizontal con snap — las polaroides siguen torciditas. */
+.album-stage {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 2.5rem 1rem 3rem;
+  scrollbar-width: none;
+}
+.album-stage::-webkit-scrollbar { display: none; }
+.album-stage > .polaroid {
+  flex: 0 0 72%;
+  scroll-snap-align: center;
+}
+
+/* Tablet/desktop (>640px): masonry denso, sin huecos. Lo "raro" lo dan
+   los tilts, la cinta, los nudges y las polaroides destacadas. */
+@media (min-width: 641px) {
+  .album-stage {
+    display: block;
+    column-gap: 1.75rem;
+    columns: 2;
+    overflow: visible;
+    padding: 3rem 0.5rem 4rem;
+  }
+  .album-stage > .polaroid {
+    flex: initial;
+    scroll-snap-align: unset;
+    display: block;
+    width: 100%;
+    break-inside: avoid;
+    margin: 0 0 2rem;
+    transform: rotate(var(--tilt, 0deg)) translateY(var(--nudge-y, 0px));
+  }
+}
+@media (min-width: 900px)  { .album-stage { columns: 3; column-gap: 2rem; } }
+@media (min-width: 1280px) { .album-stage { columns: 4; column-gap: 2.25rem; } }
+
+/* Una polaroide "destacada": ocupa todo el ancho de su columna y respira más.
+   Visible solo en pantallas grandes; en tablet quedan como las demás. */
+@media (min-width: 1280px) {
+  .album-stage > .polaroid-feature {
+    margin-top: 1rem;
+    margin-bottom: 2.6rem;
+  }
+  .album-stage > .polaroid-feature .polaroid-photo {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* Polaroid frame */
+.polaroid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--cream-soft);
+  padding: 12px 12px 0;
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--cream) 80%, transparent) inset,
+    0 18px 32px -22px color-mix(in srgb, var(--ink) 55%, transparent),
+    0 38px 60px -40px color-mix(in srgb, var(--ink) 40%, transparent);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 0.5s ease,
+              z-index 0s linear 0.5s;
+  cursor: zoom-in;
+  font: inherit;
+  text-align: left;
+  z-index: 1;
+}
+.polaroid:hover,
+.polaroid:focus-visible {
+  transform: rotate(0deg) translateY(-6px) scale(1.02);
+  box-shadow:
+    0 28px 52px -22px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 60px 90px -48px color-mix(in srgb, var(--ink) 45%, transparent);
+  z-index: 10;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 0.45s ease,
+              z-index 0s linear 0s;
+  outline: none;
+}
+.polaroid:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 4px;
+}
+
+.polaroid-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--cream-deep);
+}
+.polaroid-photo img { transition: transform 1.2s ease; }
+.polaroid:hover .polaroid-photo img { transform: scale(1.04); }
+
+.polaroid-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.85rem 0.25rem 1.15rem;
+}
+.polaroid-num {
+  font-family: var(--font-jost), sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--brick);
+}
+.polaroid-cap {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+/* Masking tape — semitransparente, mate. */
+.tape {
   position: absolute;
-  top: 8%;
-  left: 14%;
-  width: 42%;
-  height: 30%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), transparent);
-  filter: blur(4px);
-  border-radius: 50%;
+  z-index: 2;
+  width: 90px;
+  height: 22px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--blush) 55%, transparent) 0%,
+      color-mix(in srgb, var(--blush) 38%, transparent) 100%);
+  border-left: 1px dashed color-mix(in srgb, var(--ink) 12%, transparent);
+  border-right: 1px dashed color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: 0 4px 8px -6px color-mix(in srgb, var(--ink) 35%, transparent);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.tape-tl     { top: -10px; left: 16px;  transform: rotate(-8deg); }
+.tape-tr     { top: -10px; right: 16px; transform: rotate(7deg); }
+.tape-center { top: -10px; left: 50%;   transform: translateX(-50%) rotate(-2deg); width: 110px; }
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: color-mix(in srgb, var(--oxblood-deep) 86%, transparent);
+  backdrop-filter: blur(8px);
+  animation: lb-in 0.28s ease both;
+  cursor: zoom-out;
+}
+@keyframes lb-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.lightbox-figure {
+  position: relative;
+  max-width: min(72vw, 900px);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  cursor: default;
+  animation: lb-pop 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes lb-pop {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.lightbox-img {
+  background: var(--cream-soft);
+  padding: 14px 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  box-shadow: 0 50px 80px -30px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.lightbox-img img { display: block; max-height: 72vh; width: 100%; object-fit: contain; }
+.lightbox-cap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  color: var(--cream-soft);
+  font-size: 1.25rem;
+  text-align: center;
+}
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--cream-soft) 35%, transparent);
+  color: var(--cream-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-cormorant), serif;
+  font-weight: 300;
+  line-height: 1;
+  transition: background 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.lightbox-close {
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  font-size: 1.6rem;
+}
+.lightbox-close:hover { background: color-mix(in srgb, var(--cream-soft) 16%, transparent); transform: rotate(90deg); }
+.lightbox-nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  font-size: 2.4rem;
+  padding-bottom: 6px;
+}
+.lightbox-nav:hover { background: color-mix(in srgb, var(--cream-soft) 16%, transparent); border-color: var(--cream-soft); }
+.lightbox-prev { left: clamp(0.5rem, 3vw, 2.5rem); }
+.lightbox-next { right: clamp(0.5rem, 3vw, 2.5rem); }
+@media (max-width: 640px) {
+  .lightbox-nav { width: 42px; height: 42px; font-size: 1.8rem; }
 }
 
 /* reveal-on-load fade */
