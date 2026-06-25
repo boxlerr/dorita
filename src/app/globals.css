@@ -211,23 +211,18 @@ h1, h2, h3, h4 {
   margin-inline: calc(50% - 50vw);
 }
 
-/* Carril. Variables de escala por breakpoint:
-   --munit: unidad de ancho (los anchos --w de cada stack se multiplican por esto)
-   --mh: altura del mosaico · --mg: separación uniforme entre fotos. */
+/* Carril con scroll/arrastre. Escala global por breakpoint:
+   --u: unidad (ancho/alto de cada foto = número * --u) · --mg: separación. */
 .mosaic-track {
-  --munit: 0.62px;
-  --mh: 340px;
-  --mg: 7px;
+  --u: 0.55px;
+  --mg: 8px;
   position: relative;
   display: flex;
-  align-items: stretch;
-  gap: var(--mg);
-  height: var(--mh);
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding-inline: var(--mg);
+  padding: var(--mg) clamp(0.75rem, 3vw, 2rem);
   outline: none;
   touch-action: pan-x;
   cursor: grab;
@@ -239,30 +234,30 @@ h1, h2, h3, h4 {
   outline-offset: -6px;
   border-radius: 6px;
 }
+@media (min-width: 641px) { .mosaic-track { --u: 0.74px; --mg: 10px; } }
+@media (min-width: 1024px) { .mosaic-track { --u: 0.92px; --mg: 12px; } }
+@media (min-width: 1440px) { .mosaic-track { --u: 1px; } }
 
-@media (min-width: 641px) {
-  .mosaic-track { --munit: 0.84px; --mh: 460px; --mg: 10px; }
-}
-@media (min-width: 1024px) {
-  .mosaic-track { --munit: 1px; --mh: 540px; --mg: 12px; }
-}
-
-/* Columna del mosaico: ancho variable (--w) escalado por --munit.
-   Una sola foto → ocupa toda la altura; dos fotos → se apilan. */
-.mosaic-stack {
-  flex: 0 0 auto;
+/* Las dos filas, apiladas; corren juntas dentro del track. */
+.mosaic-rows {
   display: flex;
   flex-direction: column;
   gap: var(--mg);
-  height: 100%;
-  width: calc(var(--w, 260) * var(--munit));
+  width: max-content;
 }
+.mosaic-row {
+  display: flex;
+  gap: var(--mg);
+}
+.mosaic-row-top { align-items: flex-end; }      /* alineadas ABAJO (línea media) */
+.mosaic-row-bottom { align-items: flex-start; } /* alineadas ARRIBA (línea media) */
 
-/* Cada foto del mosaico — rectángulo limpio que se recorta (object-cover). */
+/* Cada foto: rectángulo limpio con ancho/alto propios, recortada (object-cover). */
 .mosaic-tile {
   position: relative;
-  flex: 1 1 0;
-  min-height: 0;
+  flex: 0 0 auto;
+  width: calc(var(--w, 300) * var(--u));
+  height: calc(var(--h, 240) * var(--u));
   overflow: hidden;
   border-radius: 3px;
   background: var(--cream-deep);
@@ -270,15 +265,11 @@ h1, h2, h3, h4 {
   padding: 0;
   border: 0;
   font: inherit;
-  box-shadow: 0 14px 30px -24px color-mix(in srgb, var(--ink) 55%, transparent);
+  box-shadow: 0 16px 32px -26px color-mix(in srgb, var(--ink) 55%, transparent);
 }
-.mosaic-tile img {
-  transition: transform 1s ease;
-}
+.mosaic-tile img { transition: transform 1s ease; }
 .mosaic-track .mosaic-tile:hover img,
-.mosaic-track .mosaic-tile:focus-visible img {
-  transform: scale(1.05);
-}
+.mosaic-track .mosaic-tile:focus-visible img { transform: scale(1.05); }
 .mosaic-tile:focus-visible {
   outline: 2px solid var(--oxblood);
   outline-offset: 3px;
@@ -691,6 +682,70 @@ h1, h2, h3, h4 {
   letter-spacing: 0.06em;
   color: color-mix(in srgb, var(--cream-soft) 60%, transparent);
 }
+
+/* ---------- Una sola pantalla: izquierda info+mapa, derecha formulario ---------- */
+.contact-section { padding-block: clamp(2.5rem, 5vw, 4.5rem); }
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 3.25rem);
+  align-items: start;
+}
+@media (min-width: 960px) {
+  .contact-layout {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(2.5rem, 4vw, 4rem);
+  }
+}
+
+/* Columna izquierda — info + mapa, todo alineado a la izquierda */
+.contact-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  text-align: left;
+}
+.contact-title { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1; }
+.contact-flourish { width: 8rem; margin: 0.1rem 0 0.1rem; }
+.contact-lead {
+  font-size: 1.02rem;
+  max-width: 40ch;
+  color: color-mix(in srgb, var(--cream-soft) 82%, transparent);
+}
+/* Número de WhatsApp compacto y a lo ancho de la columna */
+.contact-wa {
+  align-self: stretch;
+  align-items: flex-start;
+  text-align: left;
+  padding: 1rem 1.35rem;
+  gap: 0.45rem;
+}
+.contact-wa .wa-feature-number { font-size: clamp(1.55rem, 3.5vw, 2.2rem); }
+.contact-social { justify-content: flex-start; }
+
+/* Bloque de mapa: ancho de columna, alto reducido para no scrollear de más */
+.contact-map-block { width: 100%; margin-top: 0.3rem; }
+.contact-aside .pmap-frame { height: clamp(12rem, 20vw, 15.5rem); }
+.contact-aside .pmap-cap { justify-content: flex-start; gap: 0.5rem 1.6rem; }
+.contact-aside .cmap-ship { justify-content: flex-start; margin-top: 0.9rem; }
+
+/* Columna derecha — panel del formulario */
+.contact-form-panel {
+  max-width: none;
+  margin: 0;
+  text-align: left;
+  background: color-mix(in srgb, var(--cream-soft) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-soft) 24%, transparent);
+  border-radius: 1rem;
+  padding: clamp(1.4rem, 3vw, 2.3rem);
+}
+.contact-form-panel .contact-form-title { text-align: left; }
+.contact-form-panel .contact-actions { align-items: stretch; margin-top: 1.4rem; }
+.contact-form-panel .contact-submit { width: 100%; justify-content: center; }
+
+.contact-tagline { opacity: 0.85; }
 
 @media (prefers-reduced-motion: reduce) {
   .cmap-iframe,

@@ -6,32 +6,39 @@ import { collagePhotos } from "@/data/media";
 import { CATALOG_URL } from "@/data/site";
 
 /**
- * Álbum "Cápsula flowers" — mosaico editorial DRAGGABLE (formato "Be inspired").
+ * Álbum "Cápsula flowers" — mosaico editorial DRAGGABLE (formato "Be inspired"),
+ * fiel a la referencia.
  *
- * Las fotos ya no son polaroides: son rectángulos limpios acomodados en un
- * mosaico de DOS FILAS que ocupa TODO el ancho de la pantalla (full-bleed).
- * Cada "stack" (columna) lleva una foto alta (ocupa las dos filas) o un dúo
- * de dos fotos apiladas, con anchos variados para dar el ritmo irregular del
- * collage de referencia. El usuario ARRASTRA horizontalmente para recorrerlo
- * (puntero / mouse / touch); un umbral de movimiento distingue "click" de
- * "drag", así un arrastre nunca abre el lightbox. En ≤640px se mantiene el
- * mosaico (más chico) con scroll táctil.
+ * Dos FILAS de rectángulos limpios con tamaños irregulares:
+ *   · La fila SUPERIOR se alinea ABAJO (sobre la línea media) → las piezas más
+ *     bajas dejan aire arriba.
+ *   · La fila INFERIOR se alinea ARRIBA (cuelga de la línea media).
+ *   · En cada fila hay una pieza "hero" más grande (alta y ancha), igual que en
+ *     la referencia: arriba la 2ª pieza, abajo la 3ª.
+ * Como los anchos difieren entre filas, las columnas quedan "corridas" → el
+ * collage masónico de la referencia. Ocupa TODO el ancho (full-bleed) y se
+ * ARRASTRA en horizontal; un umbral de movimiento distingue "click" de "drag".
  *
  * El lightbox (Esc / ← / →) se conserva tal cual.
  */
 
-/* Cada stack es una columna del mosaico:
-   - `w`: ancho base (px) — se escala con --munit por breakpoint.
-   - `items`: índices de collagePhotos. 1 ítem → foto alta (2 filas);
-              2 ítems → dúo apilado (fila superior / inferior).
-   Los anchos alternan angosto/ancho para reproducir el ritmo de "Be inspired". */
-const STACKS: { w: number; items: number[] }[] = [
-  { w: 236, items: [0, 1] }, // dúo
-  { w: 384, items: [2] }, // alta (hero)
-  { w: 260, items: [3, 4] }, // dúo
-  { w: 312, items: [5] }, // alta
-  { w: 248, items: [6, 7] }, // dúo
-  { w: 300, items: [8, 9] }, // dúo
+/* Cada tile: índice de collagePhotos + ancho/alto base (px), escalados por --u.
+   Los anchos de TOP y BOTTOM suman ~lo mismo para que ambas filas corran juntas. */
+type Tile = { i: number; w: number; h: number };
+
+const TOP: Tile[] = [
+  { i: 0, w: 290, h: 225 },
+  { i: 1, w: 415, h: 300 }, // hero
+  { i: 2, w: 340, h: 245 },
+  { i: 3, w: 265, h: 205 },
+  { i: 4, w: 330, h: 255 },
+];
+const BOTTOM: Tile[] = [
+  { i: 5, w: 260, h: 215 },
+  { i: 6, w: 345, h: 255 },
+  { i: 7, w: 415, h: 300 }, // hero
+  { i: 8, w: 320, h: 225 },
+  { i: 9, w: 305, h: 235 },
 ];
 
 const catalogComingSoon = CATALOG_URL === "#";
@@ -162,16 +169,17 @@ export default function PiecesGallery() {
     [dismissHint],
   );
 
-  // Renderiza una foto como tile del mosaico.
-  const renderTile = (i: number) => {
-    const p = collagePhotos[i];
+  // Renderiza una foto como tile del mosaico (ancho/alto base escalados por --u).
+  const renderTile = (t: Tile) => {
+    const p = collagePhotos[t.i];
     return (
       <button
-        key={i}
+        key={t.i}
         type="button"
-        onClick={() => onPhotoClick(i)}
+        onClick={() => onPhotoClick(t.i)}
         className="mosaic-tile"
-        aria-label={`Abrir foto ${i + 1}: ${p.caption ?? p.alt}`}
+        style={{ ["--w" as string]: t.w, ["--h" as string]: t.h }}
+        aria-label={`Abrir foto ${t.i + 1}: ${p.caption ?? p.alt}`}
       >
         <Image
           src={p.img}
@@ -204,21 +212,17 @@ export default function PiecesGallery() {
           onScroll={hintVisible ? dismissHint : undefined}
           onKeyDown={onTrackKeyDown}
         >
-          {STACKS.map((s, si) => (
-            <div
-              key={si}
-              className={`mosaic-stack${s.items.length === 1 ? " mosaic-stack-tall" : ""}`}
-              style={{ ["--w" as string]: s.w }}
-            >
-              {s.items.map(renderTile)}
-            </div>
-          ))}
-
-          {/* Pista circular "Arrastrá" — se desvanece tras la primera interacción. */}
-          <span className="mosaic-hint" aria-hidden={!hintVisible} data-shown={hintVisible}>
-            Arrastrá
-          </span>
+          {/* Dos filas apiladas que corren juntas al arrastrar. */}
+          <div className="mosaic-rows">
+            <div className="mosaic-row mosaic-row-top">{TOP.map(renderTile)}</div>
+            <div className="mosaic-row mosaic-row-bottom">{BOTTOM.map(renderTile)}</div>
+          </div>
         </div>
+
+        {/* Pista circular "Arrastrá" — fija sobre el wrap, se desvanece al usar. */}
+        <span className="mosaic-hint" aria-hidden={!hintVisible} data-shown={hintVisible}>
+          Arrastrá
+        </span>
       </div>
 
       {/* CTA: catálogo completo (próximamente). */}

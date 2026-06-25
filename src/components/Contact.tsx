@@ -135,88 +135,85 @@ export default function Contact() {
   return (
     <section
       id="contacto"
-      className="section"
+      className="section contact-section"
       style={{ background: "var(--oxblood-deep)", color: "var(--cream-soft)" }}
     >
       <div className="container">
-        <div className="flex flex-col items-center text-center">
-          <p className="eyebrow mb-7" style={{ color: "var(--gold-soft)" }}>
-            Contacto
-          </p>
-          <h2 className="font-display" style={{ fontSize: "clamp(2.6rem, 7vw, 5rem)", lineHeight: 0.98 }}>
-            Pedidos y consultas
-          </h2>
-          <Flourish className="text-gold w-44 my-8" />
-          <p
-            className="max-w-xl"
-            style={{ fontSize: "1.15rem", color: "color-mix(in srgb, var(--cream-soft) 82%, transparent)" }}
-          >
-            Para consultar por una pieza, encargar una combinación pensada o
-            elegir un regalo. Respondemos con tiempo y atención al detalle.
-          </p>
+        <div className="contact-layout">
+          {/* IZQUIERDA — info de contacto + mapa de retiros */}
+          <div className="contact-aside">
+            <p className="eyebrow" style={{ color: "var(--gold-soft)" }}>
+              Contacto
+            </p>
+            <h2 className="font-display contact-title">Pedidos y consultas</h2>
+            <Flourish className="text-gold contact-flourish" />
+            <p className="contact-lead">
+              Para consultar por una pieza, encargar una combinación pensada o
+              elegir un regalo. Respondemos con tiempo y atención al detalle.
+            </p>
 
-          {/* WHATSAPP DESTACADO — número grande, clickeable, abre WhatsApp */}
-          <a
-            href={site.whatsapp.href}
-            target="_blank"
-            rel="noreferrer"
-            className="wa-feature mt-10"
-            aria-label={`Escribinos por WhatsApp al ${site.whatsapp.display}`}
-          >
-            <span className="eyebrow wa-feature-eyebrow">
-              <IconWhatsApp className="wa-feature-eyebrow-ico" />
-              Escribinos por WhatsApp
-            </span>
-            <span className="wa-feature-number font-display">
-              {site.whatsapp.display}
-            </span>
-          </a>
-
-          {/* SOCIAL — botones con line-icons */}
-          <div className="social-row mt-10">
+            {/* WHATSAPP DESTACADO — número grande, clickeable, abre WhatsApp */}
             <a
               href={site.whatsapp.href}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-solid social-btn"
+              className="wa-feature contact-wa"
+              aria-label={`Escribinos por WhatsApp al ${site.whatsapp.display}`}
             >
-              <IconWhatsApp className="social-ico" />
-              <span>WhatsApp</span>
+              <span className="eyebrow wa-feature-eyebrow">
+                <IconWhatsApp className="wa-feature-eyebrow-ico" />
+                Escribinos por WhatsApp
+              </span>
+              <span className="wa-feature-number font-display">
+                {site.whatsapp.display}
+              </span>
             </a>
-            <a
-              href={site.instagram.href}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-ghost social-btn"
-              style={{ color: "var(--cream-soft)" }}
-            >
-              <IconInstagram className="social-ico" />
-              <span>Instagram · {site.instagram.handle}</span>
-            </a>
+
+            {/* SOCIAL — botones con line-icons */}
+            <div className="social-row contact-social">
+              <a
+                href={site.whatsapp.href}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-solid social-btn"
+              >
+                <IconWhatsApp className="social-ico" />
+                <span>WhatsApp</span>
+              </a>
+              <a
+                href={site.instagram.href}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost social-btn"
+                style={{ color: "var(--cream-soft)" }}
+              >
+                <IconInstagram className="social-ico" />
+                <span>Instagram · {site.instagram.handle}</span>
+              </a>
+            </div>
+
+            {/* MAPA — dos puntos de retiro */}
+            <div className="contact-map-block">
+              <span className="eyebrow" style={{ color: "var(--gold-soft)" }}>
+                Puntos de retiro
+              </span>
+              <div className="mt-5">
+                <PickupMap />
+              </div>
+              <p className="cmap-ship font-sans-ui">
+                <IconSend className="cmap-ship-ico" />
+                Envíos a todo el país · coordinamos por WhatsApp.
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* MAPAS — dos puntos de retiro, lejos uno del otro */}
-        <div className="contact-maps mt-16">
-          <span className="eyebrow contact-maps-title" style={{ color: "var(--gold-soft)" }}>
-            Puntos de retiro
-          </span>
-          <div className="mt-7">
-            <PickupMap />
-          </div>
-          <p className="cmap-ship font-sans-ui">
-            <IconSend className="cmap-ship-ico" />
-            Envíos a todo el país · coordinamos por WhatsApp.
-          </p>
-        </div>
+          {/* DERECHA — formulario (compone un mensaje y abre WhatsApp) */}
+          <form className="contact-form contact-form-panel" onSubmit={handleSubmit} noValidate>
+            <span className="eyebrow contact-form-title" style={{ color: "var(--gold-soft)" }}>
+              Escribinos
+            </span>
 
-        {/* FORMULARIO — compone un mensaje y abre WhatsApp */}
-        <form className="contact-form mt-16" onSubmit={handleSubmit} noValidate>
-          <span className="eyebrow contact-form-title" style={{ color: "var(--gold-soft)" }}>
-            Escribinos
-          </span>
-
-          <div className="contact-grid mt-8">
+            <div className="contact-grid mt-7">
             <div className="contact-field">
               <label htmlFor="cf-nombre" className="contact-label font-sans-ui">
                 Nombre <span className="contact-req" aria-hidden="true">*</span>
@@ -298,10 +295,11 @@ export default function Contact() {
               Se abre WhatsApp con tu mensaje listo para enviar.
             </p>
           </div>
-        </form>
+          </form>
+        </div>
 
         <p
-          className="mt-12 text-center font-sans-ui"
+          className="contact-tagline mt-12 text-center font-sans-ui"
           style={{ fontSize: "0.72rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--gold-soft)" }}
         >
           Piezas únicas con piedras naturales · Hecho a mano
