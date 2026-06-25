@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { nav, site } from "@/data/site";
+import vaxlerLogo from "../photos/vaxler-logo.png";
 
 export default function SiteFooter() {
   return (
@@ -66,6 +68,26 @@ export default function SiteFooter() {
               WhatsApp
             </a>
           </div>
+        </div>
+
+        {/* Crédito Vaxler — isotipo que se prende en blanco al pasar el mouse */}
+        <div className="vaxler-credit">
+          <a
+            href="https://www.vaxler.com.ar"
+            target="_blank"
+            rel="noreferrer"
+            className="vaxler-link"
+            aria-label="Sitio creado por Vaxler — vaxler.com.ar"
+          >
+            <span className="vaxler-by font-sans-ui">Sitio por</span>
+            <Image
+              src={vaxlerLogo}
+              alt="Vaxler"
+              width={26}
+              height={28}
+              className="vaxler-logo"
+            />
+          </a>
         </div>
       </div>
     </footer>

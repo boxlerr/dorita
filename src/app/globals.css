@@ -683,6 +683,43 @@ h1, h2, h3, h4 {
   color: color-mix(in srgb, var(--cream-soft) 60%, transparent);
 }
 
+/* ---------- Crédito Vaxler en el footer ---------- */
+.vaxler-credit {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.75rem;
+}
+.vaxler-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+}
+.vaxler-by {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 42%, transparent);
+  transition: color 0.3s ease;
+}
+/* Isotipo: celeste de marca atenuado; se "prende" en blanco al hover. */
+.vaxler-logo {
+  height: 26px;
+  width: auto;
+  display: block;
+  opacity: 0.8;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+.vaxler-link:hover .vaxler-logo,
+.vaxler-link:focus-visible .vaxler-logo {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+.vaxler-link:hover .vaxler-by,
+.vaxler-link:focus-visible .vaxler-by {
+  color: color-mix(in srgb, var(--cream) 85%, transparent);
+}
+
 /* ---------- Una sola pantalla: izquierda info+mapa, derecha formulario ---------- */
 .contact-section { padding-block: clamp(2rem, 4vw, 3.5rem); }
 
