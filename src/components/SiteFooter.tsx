@@ -41,14 +41,8 @@ export default function SiteFooter() {
 
         <hr className="my-10" style={{ border: 0, borderTop: "1px solid color-mix(in srgb, var(--cream) 18%, transparent)" }} />
 
-        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-center md:justify-between">
           <div className="vaxler-foot">
-            <p
-              className="font-sans-ui"
-              style={{ fontSize: "0.72rem", letterSpacing: "0.06em", color: "color-mix(in srgb, var(--cream) 65%, transparent)" }}
-            >
-              © {new Date().getFullYear()} Dorita Atelier · Accesorios con piedras naturales
-            </p>
             {/* Crédito Vaxler — wordmark blanco que se prende al pasar el mouse */}
             <a
               href="https://www.vaxler.com.ar"
@@ -65,6 +59,12 @@ export default function SiteFooter() {
                 className="vaxler-logo"
               />
             </a>
+            <p
+              className="font-sans-ui"
+              style={{ fontSize: "0.72rem", letterSpacing: "0.06em", color: "color-mix(in srgb, var(--cream) 65%, transparent)" }}
+            >
+              © {new Date().getFullYear()} Dorita Atelier · Accesorios con piedras naturales
+            </p>
           </div>
           <div className="flex items-center gap-6">
             <a
