@@ -146,18 +146,23 @@ export default function PickupMap() {
         maxZoom: 7,
       });
 
-      // La sección es oscura y puede reflowear (fuentes, layout): recalculamos
-      // el tamaño tras pintar para que las tiles no queden grises/cortadas.
-      const raf = requestAnimationFrame(() => {
-        mapRef.current?.invalidateSize();
-      });
-      const t = setTimeout(() => {
-        mapRef.current?.invalidateSize();
-      }, 350);
+      // La columna puede reflowear (fuentes, grid responsive, imágenes):
+      // recalculamos el tamaño tras pintar para que las tiles no queden
+      // grises/cortadas. El ResizeObserver cubre cualquier cambio de tamaño
+      // del contenedor (es la causa típica del mapa "bugeado" en grid/flex).
+      const invalidate = () => mapRef.current?.invalidateSize();
+      const raf = requestAnimationFrame(invalidate);
+      const t1 = setTimeout(invalidate, 350);
+      const t2 = setTimeout(invalidate, 1200);
+
+      const ro = new ResizeObserver(() => invalidate());
+      ro.observe(container);
 
       cleanup = () => {
         cancelAnimationFrame(raf);
-        clearTimeout(t);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        ro.disconnect();
         map.remove();
         mapRef.current = null;
       };
