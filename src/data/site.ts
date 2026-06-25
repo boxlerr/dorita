@@ -25,6 +25,9 @@ export const site = {
   shipping: "Envíos a todo el país.",
 } as const;
 
+/** Catálogo completo (Drive). Aún no está listo → "#" muestra estado "próximamente". */
+export const CATALOG_URL = "#";
+
 /** Anclas de navegación, en el orden de la página. */
 export const nav = [
   { href: "#historia", label: "Historia" },

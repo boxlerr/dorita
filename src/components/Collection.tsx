@@ -4,7 +4,7 @@ import { categories } from "@/data/catalog";
 
 export default function Collection() {
   return (
-    <section id="piezas" className="section" style={{ background: "var(--cream-soft)" }}>
+    <section id="piezas" className="section" style={{ background: "var(--cream-soft)", overflowX: "clip" }}>
       <div className="container">
         <div className="flex flex-col items-center text-center">
           <p className="eyebrow text-brick mb-6">Las piezas</p>
@@ -20,12 +20,12 @@ export default function Collection() {
           </p>
         </div>
 
-        {/* Álbum: polaroids sobre lino con tilts y masking tape. Click → lightbox. */}
+        {/* Álbum: mosaico full-bleed de dos filas (formato "Be inspired"). Click → lightbox. */}
         <p
           className="font-sans-ui mt-9 text-center text-ink-soft"
           style={{ fontSize: "0.7rem", letterSpacing: "0.28em", textTransform: "uppercase" }}
         >
-          · El álbum · tocá una foto para verla en grande ·
+          · El álbum · arrastrá para recorrer · tocá una foto para verla en grande ·
         </p>
         <PiecesGallery />
 

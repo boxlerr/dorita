@@ -197,147 +197,172 @@ h1, h2, h3, h4 {
       transparent 1px, transparent 4px);
 }
 
-/* Mobile (≤640px): carrusel horizontal con snap — las polaroides siguen torciditas. */
-.album-stage {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 2.5rem 1rem 3rem;
-  scrollbar-width: none;
-}
-.album-stage::-webkit-scrollbar { display: none; }
-.album-stage > .polaroid {
-  flex: 0 0 72%;
-  scroll-snap-align: center;
-}
+/* ============================================================
+   Mosaico arrastrable — "Cápsula flowers" (formato "Be inspired")
+   Fotos rectangulares limpias en un mosaico de DOS filas que ocupa
+   todo el ancho de la pantalla (full-bleed) y se arrastra en horizontal.
+   El lightbox se reutiliza tal cual.
+   ============================================================ */
 
-/* Tablet/desktop (>640px): masonry denso, sin huecos. Lo "raro" lo dan
-   los tilts, la cinta, los nudges y las polaroides destacadas. */
-@media (min-width: 641px) {
-  .album-stage {
-    display: block;
-    column-gap: 1.75rem;
-    columns: 2;
-    overflow: visible;
-    padding: 3rem 0.5rem 4rem;
-  }
-  .album-stage > .polaroid {
-    flex: initial;
-    scroll-snap-align: unset;
-    display: block;
-    width: 100%;
-    break-inside: avoid;
-    margin: 0 0 2rem;
-    transform: rotate(var(--tilt, 0deg)) translateY(var(--nudge-y, 0px));
-  }
-}
-@media (min-width: 900px)  { .album-stage { columns: 3; column-gap: 2rem; } }
-@media (min-width: 1280px) { .album-stage { columns: 4; column-gap: 2.25rem; } }
-
-/* Una polaroide "destacada": ocupa todo el ancho de su columna y respira más.
-   Visible solo en pantallas grandes; en tablet quedan como las demás. */
-@media (min-width: 1280px) {
-  .album-stage > .polaroid-feature {
-    margin-top: 1rem;
-    margin-bottom: 2.6rem;
-  }
-  .album-stage > .polaroid-feature .polaroid-photo {
-    aspect-ratio: 3 / 4;
-  }
-}
-
-/* Polaroid frame */
-.polaroid {
+/* Full-bleed: rompe el max-width del .container para ir de lado a lado. */
+.mosaic-wrap {
   position: relative;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* Carril. Variables de escala por breakpoint:
+   --munit: unidad de ancho (los anchos --w de cada stack se multiplican por esto)
+   --mh: altura del mosaico · --mg: separación uniforme entre fotos. */
+.mosaic-track {
+  --munit: 0.62px;
+  --mh: 340px;
+  --mg: 7px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--mg);
+  height: var(--mh);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-inline: var(--mg);
+  outline: none;
+  touch-action: pan-x;
+  cursor: grab;
+}
+.mosaic-track::-webkit-scrollbar { display: none; }
+.mosaic-track:active { cursor: grabbing; }
+.mosaic-track:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: -6px;
+  border-radius: 6px;
+}
+
+@media (min-width: 641px) {
+  .mosaic-track { --munit: 0.84px; --mh: 460px; --mg: 10px; }
+}
+@media (min-width: 1024px) {
+  .mosaic-track { --munit: 1px; --mh: 540px; --mg: 12px; }
+}
+
+/* Columna del mosaico: ancho variable (--w) escalado por --munit.
+   Una sola foto → ocupa toda la altura; dos fotos → se apilan. */
+.mosaic-stack {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  background: var(--cream-soft);
-  padding: 12px 12px 0;
-  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
-  border-radius: 2px;
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--cream) 80%, transparent) inset,
-    0 18px 32px -22px color-mix(in srgb, var(--ink) 55%, transparent),
-    0 38px 60px -40px color-mix(in srgb, var(--ink) 40%, transparent);
-  transform: rotate(var(--tilt, 0deg));
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
-              box-shadow 0.5s ease,
-              z-index 0s linear 0.5s;
-  cursor: zoom-in;
-  font: inherit;
-  text-align: left;
-  z-index: 1;
-}
-.polaroid:hover,
-.polaroid:focus-visible {
-  transform: rotate(0deg) translateY(-6px) scale(1.02);
-  box-shadow:
-    0 28px 52px -22px color-mix(in srgb, var(--ink) 60%, transparent),
-    0 60px 90px -48px color-mix(in srgb, var(--ink) 45%, transparent);
-  z-index: 10;
-  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1),
-              box-shadow 0.45s ease,
-              z-index 0s linear 0s;
-  outline: none;
-}
-.polaroid:focus-visible {
-  outline: 2px solid var(--oxblood);
-  outline-offset: 4px;
+  gap: var(--mg);
+  height: 100%;
+  width: calc(var(--w, 260) * var(--munit));
 }
 
-.polaroid-photo {
+/* Cada foto del mosaico — rectángulo limpio que se recorta (object-cover). */
+.mosaic-tile {
   position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 5;
+  flex: 1 1 0;
+  min-height: 0;
   overflow: hidden;
+  border-radius: 3px;
   background: var(--cream-deep);
+  cursor: zoom-in;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  box-shadow: 0 14px 30px -24px color-mix(in srgb, var(--ink) 55%, transparent);
 }
-.polaroid-photo img { transition: transform 1.2s ease; }
-.polaroid:hover .polaroid-photo img { transform: scale(1.04); }
-
-.polaroid-meta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.85rem 0.25rem 1.15rem;
+.mosaic-tile img {
+  transition: transform 1s ease;
 }
-.polaroid-num {
-  font-family: var(--font-jost), sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--brick);
+.mosaic-track .mosaic-tile:hover img,
+.mosaic-track .mosaic-tile:focus-visible img {
+  transform: scale(1.05);
 }
-.polaroid-cap {
-  font-family: var(--font-cormorant), serif;
-  font-style: italic;
-  font-size: 0.92rem;
-  color: var(--ink-soft);
-  text-align: right;
+.mosaic-tile:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
 }
 
-/* Masking tape — semitransparente, mate. */
-.tape {
+/* Pista circular "Arrastrá" — flota sobre el carril, se desvanece al usarlo. */
+.mosaic-hint {
   position: absolute;
-  z-index: 2;
-  width: 90px;
-  height: 22px;
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--blush) 55%, transparent) 0%,
-      color-mix(in srgb, var(--blush) 38%, transparent) 100%);
-  border-left: 1px dashed color-mix(in srgb, var(--ink) 12%, transparent);
-  border-right: 1px dashed color-mix(in srgb, var(--ink) 12%, transparent);
-  box-shadow: 0 4px 8px -6px color-mix(in srgb, var(--ink) 35%, transparent);
+  top: 50%;
+  right: clamp(1rem, 5vw, 3rem);
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: var(--oxblood);
+  color: var(--cream-soft);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  font-family: var(--font-jost), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.58rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 14px 26px -16px color-mix(in srgb, var(--ink) 70%, transparent);
   pointer-events: none;
-  mix-blend-mode: multiply;
+  opacity: 1;
+  transform: translateY(-50%);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  animation: mosaic-hint-breathe 2.6s ease-in-out infinite;
 }
-.tape-tl     { top: -10px; left: 16px;  transform: rotate(-8deg); }
-.tape-tr     { top: -10px; right: 16px; transform: rotate(7deg); }
-.tape-center { top: -10px; left: 50%;   transform: translateX(-50%) rotate(-2deg); width: 110px; }
+
+/* Desvanecido: al marcar el track .is-touched (o por el atributo data-shown). */
+.mosaic-track.is-touched .mosaic-hint,
+.mosaic-hint[data-shown="false"] {
+  opacity: 0;
+  transform: translateY(-50%) scale(0.85);
+  animation: none;
+}
+
+@keyframes mosaic-hint-breathe {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.06); }
+}
+
+/* CTA "Ver catálogo completo" — vive después del collage. */
+.collage-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+.collage-catalog {
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+/* Sub-etiqueta "· próximamente": discreta, no parece un link muerto. */
+.collage-catalog-soon {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  opacity: 0.78;
+  font-style: normal;
+}
+/* El botón "próximamente" mantiene el look .btn-solid pero invita con suavidad. */
+.collage-catalog[aria-disabled="true"] {
+  cursor: default;
+}
+.collage-catalog[aria-disabled="true"]:hover {
+  background: var(--oxblood-deep);
+  transform: translateY(-2px);
+}
+
+/* Respeta reduced-motion: sin zoom ni animación del hint. */
+@media (prefers-reduced-motion: reduce) {
+  .mosaic-track .mosaic-tile:hover img,
+  .mosaic-track .mosaic-tile:focus-visible img {
+    transform: none;
+  }
+  .mosaic-hint { animation: none; }
+  .mosaic-track { scroll-behavior: auto; }
+}
 
 /* ---------- Lightbox ---------- */
 .lightbox {
@@ -440,4 +465,490 @@ h1, h2, h3, h4 {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rise { animation: none; }
+}
+
+/* ============================================================
+   Contacto — social icons, mapas vintage y formulario WhatsApp
+   Prefijos: .social-* / .cmap-* / .contact-*
+   ============================================================ */
+
+/* ---------- Social: botones con icono ---------- */
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.social-btn {
+  text-transform: none;
+  letter-spacing: 0.08em;
+}
+.social-ico {
+  flex: 0 0 auto;
+  font-size: 1.15em;
+  opacity: 0.92;
+}
+
+/* ---------- Mapas ---------- */
+.contact-maps-title {
+  display: block;
+  text-align: center;
+}
+.cmap-grid {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) {
+  .cmap-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.cmap-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Marco vintage sobre el .img-frame existente + filtro cálido sepia */
+.cmap-frame {
+  aspect-ratio: 16 / 10;
+}
+.cmap-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: sepia(0.32) saturate(0.85) contrast(0.96) brightness(0.97)
+    hue-rotate(-8deg);
+  transition: filter 0.5s ease;
+}
+.cmap-frame:hover .cmap-iframe,
+.cmap-frame:focus-within .cmap-iframe {
+  filter: sepia(0.12) saturate(0.95) contrast(1) brightness(1);
+}
+
+.cmap-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-inline: 0.25rem;
+}
+.cmap-place {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+}
+.cmap-pin {
+  align-self: center;
+  font-size: 1rem;
+  color: var(--gold-soft);
+}
+.cmap-region {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blush);
+}
+.cmap-link {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-soft) 45%, transparent);
+  padding-bottom: 2px;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.cmap-link:hover {
+  color: var(--cream-soft);
+  border-color: var(--cream-soft);
+}
+
+.cmap-ship {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--cream-soft) 78%, transparent);
+}
+.cmap-ship-ico {
+  font-size: 1rem;
+  color: var(--gold-soft);
+}
+
+/* ---------- Formulario ---------- */
+.contact-form {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+.contact-form-title {
+  display: block;
+}
+.contact-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  text-align: left;
+}
+@media (min-width: 600px) {
+  .contact-grid { grid-template-columns: 1fr 1fr; }
+}
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.contact-field-full {
+  grid-column: 1 / -1;
+}
+.contact-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+.contact-label-ico {
+  font-size: 1rem;
+  opacity: 0.85;
+}
+.contact-req {
+  color: var(--blush);
+}
+.contact-opt {
+  letter-spacing: 0.08em;
+  text-transform: none;
+  font-size: 0.66rem;
+  color: color-mix(in srgb, var(--cream-soft) 55%, transparent);
+}
+
+.contact-input {
+  width: 100%;
+  font-family: var(--font-jost), sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--cream-soft) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent);
+  border-radius: 3px;
+  padding: 0.8rem 0.95rem;
+  line-height: 1.5;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease,
+    background-color 0.3s ease;
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.contact-input::placeholder {
+  color: color-mix(in srgb, var(--ink-soft) 55%, transparent);
+  font-style: italic;
+}
+.contact-input:focus {
+  outline: none;
+  background: var(--cream-soft);
+  border-color: var(--gold-soft);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--gold-soft) 40%, transparent),
+    inset 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.contact-textarea {
+  resize: vertical;
+  min-height: 7.5rem;
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.contact-error {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--blush);
+}
+
+.contact-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+}
+.contact-submit {
+  text-transform: none;
+  letter-spacing: 0.08em;
+}
+.contact-note {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--cream-soft) 60%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmap-iframe,
+  .contact-input { transition: none; }
+}
+
+/* ============================================================
+   Puntos de retiro — mapa Leaflet único (prefijo .pmap-*)
+   Reutiliza .img-frame y las variables de marca existentes.
+   ============================================================ */
+
+.pmap-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Marco vintage sobre .img-frame: alto fijo para que el mapa tenga
+   dónde renderizar (Leaflet necesita un contenedor con altura). */
+.pmap-frame {
+  height: clamp(20rem, 52vw, 30rem);
+  padding: 0; /* el mapa llena el marco; el inset gold lo da .img-frame */
+}
+
+/* El div que Leaflet rellena: ocupa todo el marco. */
+.pmap-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--cream-deep); /* color de carga mientras llegan tiles */
+}
+
+/* Filtro cálido sepia sobre las tiles para el look heritage; se aclara al
+   interactuar. Se aplica solo al panel de tiles para no teñir controles. */
+.pmap-canvas .leaflet-tile-pane {
+  filter: sepia(0.3) saturate(0.85) contrast(0.96) brightness(0.97)
+    hue-rotate(-8deg);
+  transition: filter 0.5s ease;
+}
+.pmap-canvas:hover .leaflet-tile-pane,
+.pmap-canvas:focus-within .leaflet-tile-pane {
+  filter: sepia(0.1) saturate(0.95) contrast(1) brightness(1);
+}
+
+/* divIcon: sin caja blanca por defecto; solo el pin SVG dorado/oxblood. */
+.pmap-divicon {
+  background: transparent;
+  border: 0;
+}
+.pmap-pin {
+  display: block;
+  color: var(--oxblood);
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--ink) 45%, transparent));
+}
+.pmap-pin svg {
+  display: block;
+}
+
+/* Popup en clave de marca. */
+.pmap-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-family: var(--font-jost), sans-serif;
+  min-width: 9rem;
+}
+.pmap-popup-place {
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--oxblood-deep);
+  line-height: 1.1;
+}
+.pmap-popup-region {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pmap-popup-link {
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brick);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--brick) 45%, transparent);
+  padding-bottom: 2px;
+  align-self: flex-start;
+}
+.pmap-popup-link:hover {
+  color: var(--oxblood-deep);
+  border-color: var(--oxblood-deep);
+}
+
+/* Tema del recuadro del popup de Leaflet (sobrescribe defaults). */
+.pmap-canvas .leaflet-popup-content-wrapper {
+  background: var(--cream-soft);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 14px 30px -16px color-mix(in srgb, var(--ink) 70%, transparent);
+}
+.pmap-canvas .leaflet-popup-content {
+  margin: 0.7rem 0.85rem;
+}
+.pmap-canvas .leaflet-popup-tip {
+  background: var(--cream-soft);
+}
+
+/* Tooltip en tono crema. */
+.pmap-canvas .leaflet-tooltip {
+  background: var(--oxblood-deep);
+  color: var(--cream-soft);
+  border: 0;
+  border-radius: 3px;
+  font-family: var(--font-jost), sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.55rem;
+  box-shadow: 0 8px 20px -12px color-mix(in srgb, var(--ink) 70%, transparent);
+}
+.pmap-canvas .leaflet-tooltip-top::before {
+  border-top-color: var(--oxblood-deep);
+}
+
+/* Controles de zoom en clave de marca. */
+.pmap-canvas .leaflet-bar a {
+  background: var(--cream-soft);
+  color: var(--oxblood);
+  border-bottom-color: color-mix(in srgb, var(--gold) 35%, transparent);
+}
+.pmap-canvas .leaflet-bar a:hover {
+  background: var(--cream-deep);
+  color: var(--oxblood-deep);
+}
+
+/* Atribución legible sobre el filtro cálido. */
+.pmap-canvas .leaflet-control-attribution {
+  background: color-mix(in srgb, var(--cream-soft) 88%, transparent);
+  color: var(--ink-soft);
+  font-family: var(--font-jost), sans-serif;
+  font-size: 0.6rem;
+}
+.pmap-canvas .leaflet-control-attribution a {
+  color: var(--brick);
+}
+
+/* Leyenda debajo del mapa: ambos puntos como enlaces "cómo llegar". */
+.pmap-cap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  justify-content: center;
+  padding-inline: 0.25rem;
+}
+.pmap-cap-item {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+.pmap-cap-item:hover {
+  transform: translateY(-2px);
+}
+.pmap-cap-place {
+  font-size: 1.5rem;
+  color: var(--cream-soft);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+.pmap-cap-item:hover .pmap-cap-place {
+  border-bottom-color: var(--gold-soft);
+}
+.pmap-cap-region {
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blush);
+}
+
+/* Fallback accesible: oculto a la vista, presente para lectores de pantalla. */
+.pmap-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmap-canvas .leaflet-tile-pane,
+  .pmap-cap-item,
+  .pmap-cap-place {
+    transition: none;
+  }
+}
+
+/* ---------- WhatsApp destacado: número grande clickeable ---------- */
+.wa-feature {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.6rem 2.6rem;
+  border-radius: 1.25rem;
+  text-align: center;
+  text-decoration: none;
+  color: var(--cream-soft);
+  background: color-mix(in srgb, var(--cream-soft) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-soft) 38%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cream-soft) 6%, transparent);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.wa-feature:hover,
+.wa-feature:focus-visible {
+  border-color: color-mix(in srgb, var(--gold-soft) 70%, transparent);
+  background: color-mix(in srgb, var(--cream-soft) 8%, transparent);
+  transform: translateY(-2px);
+}
+.wa-feature:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 4px;
+}
+
+.wa-feature-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--gold-soft);
+}
+.wa-feature-eyebrow-ico {
+  flex: 0 0 auto;
+  font-size: 1.05em;
+  opacity: 0.92;
+}
+
+.wa-feature-number {
+  font-size: clamp(1.9rem, 6vw, 3.1rem);
+  line-height: 1;
+  letter-spacing: 0.005em;
+  color: var(--cream-soft);
+  transition: color 0.3s ease;
+}
+.wa-feature:hover .wa-feature-number,
+.wa-feature:focus-visible .wa-feature-number {
+  color: var(--gold-soft);
+}
+
+@media (max-width: 480px) {
+  .wa-feature {
+    padding: 1.3rem 1.6rem;
+    width: 100%;
+  }
 }

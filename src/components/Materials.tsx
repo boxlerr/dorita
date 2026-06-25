@@ -11,14 +11,14 @@ export default function Materials() {
     >
       <div className="container section">
         <div className="grid items-center gap-12 md:grid-cols-12 md:gap-16">
-          {/* Imagen */}
-          <figure className="md:col-span-5">
-            <div className="img-frame" style={{ aspectRatio: "4 / 5" }}>
+          {/* Imagen — primero en el DOM: encabeza el apilado en mobile y revela antes */}
+          <figure className="rise md:col-span-6">
+            <div className="img-frame" style={{ aspectRatio: "4 / 5.2" }}>
               <Image
                 src={piedrasPhoto.img}
                 alt={piedrasPhoto.alt}
                 fill
-                sizes="(max-width: 768px) 100vw, 40vw"
+                sizes="(max-width: 768px) 100vw, 46vw"
                 placeholder="blur"
                 className="object-cover"
               />
@@ -26,17 +26,21 @@ export default function Materials() {
           </figure>
 
           {/* Texto */}
-          <div className="md:col-span-7">
+          <div className="rise md:col-span-6" style={{ animationDelay: "0.12s" }}>
             <p className="eyebrow mb-6" style={{ color: "var(--gold-soft)" }}>
               Los materiales
             </p>
-            <h2 className="font-display" style={{ fontSize: "clamp(2.4rem, 6vw, 4.6rem)", lineHeight: 1 }}>
+            <h2
+              className="font-display"
+              style={{ fontSize: "clamp(2.6rem, 6.4vw, 5rem)", lineHeight: 0.98 }}
+            >
               Las piedras
             </h2>
 
             <div
               className="mt-9 space-y-6"
               style={{
+                maxWidth: "58ch",
                 fontSize: "1.16rem",
                 lineHeight: 1.62,
                 color: "color-mix(in srgb, var(--cream-soft) 88%, transparent)",
@@ -57,7 +61,10 @@ export default function Materials() {
                 cordón y mostacillas, porque cada combinación pide su propio
                 soporte.
               </p>
-              <p className="font-display italic" style={{ fontSize: "1.5rem", color: "var(--blush)" }}>
+              <p
+                className="font-display italic"
+                style={{ fontSize: "1.5rem", color: "var(--blush)" }}
+              >
                 Nada es descartable. Todo está elegido para que la pieza te
                 acompañe.
               </p>

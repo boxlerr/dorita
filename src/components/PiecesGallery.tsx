@@ -1,40 +1,45 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { collagePhotos } from "@/data/media";
+import { CATALOG_URL } from "@/data/site";
 
 /**
- * Álbum "Cápsula flowers": polaroids sobre lino, con tilts leves, cinta de
- * masking tape en algunas, y un lightbox para abrir cada una.
+ * Álbum "Cápsula flowers" — mosaico editorial DRAGGABLE (formato "Be inspired").
  *
- * El layout es masonry denso (CSS columns) — sin huecos. Lo "raro" lo dan
- * los tilts individuales, la cinta, los desplazamientos verticales y un par
- * de polaroides destacadas que rompen el ritmo.
+ * Las fotos ya no son polaroides: son rectángulos limpios acomodados en un
+ * mosaico de DOS FILAS que ocupa TODO el ancho de la pantalla (full-bleed).
+ * Cada "stack" (columna) lleva una foto alta (ocupa las dos filas) o un dúo
+ * de dos fotos apiladas, con anchos variados para dar el ritmo irregular del
+ * collage de referencia. El usuario ARRASTRA horizontalmente para recorrerlo
+ * (puntero / mouse / touch); un umbral de movimiento distingue "click" de
+ * "drag", así un arrastre nunca abre el lightbox. En ≤640px se mantiene el
+ * mosaico (más chico) con scroll táctil.
+ *
+ * El lightbox (Esc / ← / →) se conserva tal cual.
  */
-type Meta = {
-  tilt: number;                       // degrees
-  tape?: "tl" | "tr" | "center";      // posición de la cinta (si la lleva)
-  feature?: boolean;                  // polaroide destacada (más grande)
-  nudgeY?: number;                    // desplazamiento vertical en px
-};
 
-const META: Meta[] = [
-  { tilt: -3.2, tape: "tl",     nudgeY: 0 },
-  { tilt:  2.6,                 nudgeY: 14 },
-  { tilt: -1.4, tape: "center", feature: true,  nudgeY: 8 },
-  { tilt:  4.1,                 nudgeY: -6 },
-  { tilt: -2.8, tape: "tr",     nudgeY: 18 },
-  { tilt:  3.3,                 nudgeY: 4 },
-  { tilt: -4.0,                 nudgeY: 10 },
-  { tilt:  1.6, tape: "tl",     nudgeY: -4 },
-  { tilt: -2.2,                 nudgeY: 12, feature: true },
-  { tilt:  3.0, tape: "tr",     nudgeY: 0 },
+/* Cada stack es una columna del mosaico:
+   - `w`: ancho base (px) — se escala con --munit por breakpoint.
+   - `items`: índices de collagePhotos. 1 ítem → foto alta (2 filas);
+              2 ítems → dúo apilado (fila superior / inferior).
+   Los anchos alternan angosto/ancho para reproducir el ritmo de "Be inspired". */
+const STACKS: { w: number; items: number[] }[] = [
+  { w: 236, items: [0, 1] }, // dúo
+  { w: 384, items: [2] }, // alta (hero)
+  { w: 260, items: [3, 4] }, // dúo
+  { w: 312, items: [5] }, // alta
+  { w: 248, items: [6, 7] }, // dúo
+  { w: 300, items: [8, 9] }, // dúo
 ];
+
+const catalogComingSoon = CATALOG_URL === "#";
 
 export default function PiecesGallery() {
   const [open, setOpen] = useState<number | null>(null);
 
+  // ---- Lightbox (idéntico al original) ----
   const close = useCallback(() => setOpen(null), []);
   const next = useCallback(
     () => setOpen((i) => (i === null ? null : (i + 1) % collagePhotos.length)),
@@ -64,44 +69,179 @@ export default function PiecesGallery() {
     };
   }, [open, close, next, prev]);
 
+  // ---- Drag-to-pan ----
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [hintVisible, setHintVisible] = useState(true);
+
+  // Estado del gesto guardado en un ref para no re-renderizar mientras se arrastra.
+  const drag = useRef({
+    active: false, // hay un puntero presionado dentro del carril
+    moved: false, // superó el umbral → es un arrastre, no un click
+    startX: 0,
+    startScroll: 0,
+    pointerId: -1,
+  });
+
+  const DRAG_THRESHOLD = 6; // px
+
+  const dismissHint = useCallback(() => setHintVisible(false), []);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    // Solo arrastre con puntero "directo" (mouse/touch/pen). Ignorar si abrió el menú contextual.
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    const track = trackRef.current;
+    if (!track) return;
+    drag.current = {
+      active: true,
+      moved: false,
+      startX: e.clientX,
+      startScroll: track.scrollLeft,
+      pointerId: e.pointerId,
+    };
+  }, []);
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const d = drag.current;
+      if (!d.active) return;
+      const track = trackRef.current;
+      if (!track) return;
+      const dx = e.clientX - d.startX;
+      if (!d.moved && Math.abs(dx) > DRAG_THRESHOLD) {
+        d.moved = true;
+        dismissHint();
+        // Capturar el puntero recién cuando confirmamos arrastre, para que un
+        // simple tap siga llegando al botón (y abra el lightbox).
+        try {
+          track.setPointerCapture(d.pointerId);
+        } catch {
+          /* algunos navegadores pueden rechazarlo; no es crítico */
+        }
+      }
+      if (d.moved) {
+        track.scrollLeft = d.startScroll - dx;
+      }
+    },
+    [dismissHint],
+  );
+
+  const endDrag = useCallback(() => {
+    const d = drag.current;
+    const track = trackRef.current;
+    if (track && d.pointerId !== -1) {
+      try {
+        track.releasePointerCapture(d.pointerId);
+      } catch {
+        /* noop */
+      }
+    }
+    d.active = false;
+    d.pointerId = -1;
+    // "moved" se reinicia en el próximo pointerdown; el onClick lo lee antes.
+  }, []);
+
+  // Click en una foto: abre el lightbox solo si NO fue un arrastre.
+  const onPhotoClick = useCallback((i: number) => {
+    if (drag.current.moved) return; // fue un drag → no abrir
+    setOpen(i);
+  }, []);
+
+  // Teclado: flechas mueven el carril; el hint se va al primer uso.
+  const onTrackKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const track = trackRef.current;
+      if (!track) return;
+      if (e.key === "ArrowRight") {
+        track.scrollBy({ left: 300, behavior: "smooth" });
+        dismissHint();
+      } else if (e.key === "ArrowLeft") {
+        track.scrollBy({ left: -300, behavior: "smooth" });
+        dismissHint();
+      }
+    },
+    [dismissHint],
+  );
+
+  // Renderiza una foto como tile del mosaico.
+  const renderTile = (i: number) => {
+    const p = collagePhotos[i];
+    return (
+      <button
+        key={i}
+        type="button"
+        onClick={() => onPhotoClick(i)}
+        className="mosaic-tile"
+        aria-label={`Abrir foto ${i + 1}: ${p.caption ?? p.alt}`}
+      >
+        <Image
+          src={p.img}
+          alt={p.alt}
+          fill
+          sizes="(max-width: 640px) 45vw, 360px"
+          placeholder="blur"
+          className="object-cover"
+        />
+      </button>
+    );
+  };
+
   return (
     <>
-      {/* Desktop/tablet: masonry denso de polaroides. Mobile: carrusel con snap. */}
-      <div className="album-stage mt-14">
-        {collagePhotos.map((p, i) => {
-          const m = META[i] ?? META[0];
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setOpen(i)}
-              className={`polaroid${m.feature ? " polaroid-feature" : ""}`}
-              style={{
-                ["--tilt" as string]: `${m.tilt}deg`,
-                ["--nudge-y" as string]: `${m.nudgeY ?? 0}px`,
-              }}
-              aria-label={`Abrir foto ${i + 1}: ${p.caption ?? p.alt}`}
+      {/* Mosaico arrastrable full-bleed (formato "Be inspired"). */}
+      <div className="mosaic-wrap mt-10">
+        <div
+          ref={trackRef}
+          className={`mosaic-track${hintVisible ? "" : " is-touched"}`}
+          role="group"
+          aria-roledescription="carrusel"
+          aria-label="Álbum de piezas — arrastrá para recorrer las fotos"
+          tabIndex={0}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerLeave={endDrag}
+          onScroll={hintVisible ? dismissHint : undefined}
+          onKeyDown={onTrackKeyDown}
+        >
+          {STACKS.map((s, si) => (
+            <div
+              key={si}
+              className={`mosaic-stack${s.items.length === 1 ? " mosaic-stack-tall" : ""}`}
+              style={{ ["--w" as string]: s.w }}
             >
-              {m.tape && <span className={`tape tape-${m.tape}`} aria-hidden />}
-              <span className="polaroid-photo">
-                <Image
-                  src={p.img}
-                  alt={p.alt}
-                  sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 28vw"
-                  placeholder="blur"
-                  className="h-full w-full object-cover"
-                />
-              </span>
-              <span className="polaroid-meta">
-                <span className="polaroid-num">· {String(i + 1).padStart(2, "0")} ·</span>
-                <span className="polaroid-cap">{p.caption ?? ""}</span>
-              </span>
-            </button>
-          );
-        })}
+              {s.items.map(renderTile)}
+            </div>
+          ))}
+
+          {/* Pista circular "Arrastrá" — se desvanece tras la primera interacción. */}
+          <span className="mosaic-hint" aria-hidden={!hintVisible} data-shown={hintVisible}>
+            Arrastrá
+          </span>
+        </div>
       </div>
 
-      {/* Lightbox */}
+      {/* CTA: catálogo completo (próximamente). */}
+      <div className="collage-cta">
+        {catalogComingSoon ? (
+          <button
+            type="button"
+            className="btn btn-solid collage-catalog"
+            aria-disabled="true"
+            title="El catálogo completo estará disponible muy pronto"
+            onClick={(e) => e.preventDefault()}
+          >
+            Ver catálogo completo
+            <span className="collage-catalog-soon">· próximamente</span>
+          </button>
+        ) : (
+          <a href={CATALOG_URL} target="_blank" rel="noreferrer" className="btn btn-solid collage-catalog">
+            Ver catálogo completo
+          </a>
+        )}
+      </div>
+
+      {/* Lightbox — sin cambios. */}
       {open !== null && (
         <div
           className="lightbox"
