@@ -41,13 +41,31 @@ export default function SiteFooter() {
 
         <hr className="my-10" style={{ border: 0, borderTop: "1px solid color-mix(in srgb, var(--cream) 18%, transparent)" }} />
 
-        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:justify-between">
-          <p
-            className="font-sans-ui"
-            style={{ fontSize: "0.72rem", letterSpacing: "0.06em", color: "color-mix(in srgb, var(--cream) 65%, transparent)" }}
-          >
-            © {new Date().getFullYear()} Dorita Atelier · Accesorios con piedras naturales
-          </p>
+        <div className="flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:justify-between">
+          <div className="vaxler-foot">
+            <p
+              className="font-sans-ui"
+              style={{ fontSize: "0.72rem", letterSpacing: "0.06em", color: "color-mix(in srgb, var(--cream) 65%, transparent)" }}
+            >
+              © {new Date().getFullYear()} Dorita Atelier · Accesorios con piedras naturales
+            </p>
+            {/* Crédito Vaxler — wordmark blanco que se prende al pasar el mouse */}
+            <a
+              href="https://www.vaxler.com.ar"
+              target="_blank"
+              rel="noreferrer"
+              className="vaxler-link"
+              aria-label="Sitio creado por Vaxler — vaxler.com.ar"
+            >
+              <Image
+                src={vaxlerLogo}
+                alt="Vaxler"
+                width={78}
+                height={15}
+                className="vaxler-logo"
+              />
+            </a>
+          </div>
           <div className="flex items-center gap-6">
             <a
               href={site.instagram.href}
@@ -68,25 +86,6 @@ export default function SiteFooter() {
               WhatsApp
             </a>
           </div>
-        </div>
-
-        {/* Crédito Vaxler — isotipo que se prende en blanco al pasar el mouse */}
-        <div className="vaxler-credit">
-          <a
-            href="https://www.vaxler.com.ar"
-            target="_blank"
-            rel="noreferrer"
-            className="vaxler-link"
-            aria-label="Sitio creado por Vaxler — vaxler.com.ar"
-          >
-            <Image
-              src={vaxlerLogo}
-              alt="Vaxler"
-              width={93}
-              height={18}
-              className="vaxler-logo"
-            />
-          </a>
         </div>
       </div>
     </footer>

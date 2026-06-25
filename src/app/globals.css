@@ -684,21 +684,24 @@ h1, h2, h3, h4 {
 }
 
 /* ---------- Crédito Vaxler en el footer ---------- */
-.vaxler-credit {
-  display: flex;
-  justify-content: center;
-  margin-top: 2.75rem;
+/* Grupo izquierdo: © arriba, wordmark VAXLER justo debajo (compacto). */
+.vaxler-foot {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .vaxler-foot { align-items: flex-start; }
 }
 .vaxler-link {
   display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
   text-decoration: none;
 }
 /* Wordmark VAXLER en blanco (igual que UIAB): atenuado por defecto,
    se prende a blanco pleno al pasar el mouse. */
 .vaxler-logo {
-  height: 17px;
+  height: 13px;
   width: auto;
   display: block;
   filter: brightness(0) invert(1);
