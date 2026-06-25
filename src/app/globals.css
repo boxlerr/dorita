@@ -695,29 +695,19 @@ h1, h2, h3, h4 {
   gap: 0.65rem;
   text-decoration: none;
 }
-.vaxler-by {
-  font-size: 0.6rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--cream) 42%, transparent);
-  transition: color 0.3s ease;
-}
-/* Isotipo: celeste de marca atenuado; se "prende" en blanco al hover. */
+/* Wordmark VAXLER en blanco (igual que UIAB): atenuado por defecto,
+   se prende a blanco pleno al pasar el mouse. */
 .vaxler-logo {
-  height: 26px;
+  height: 17px;
   width: auto;
   display: block;
-  opacity: 0.8;
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  filter: brightness(0) invert(1);
+  opacity: 0.42;
+  transition: opacity 0.3s ease;
 }
 .vaxler-link:hover .vaxler-logo,
 .vaxler-link:focus-visible .vaxler-logo {
-  filter: brightness(0) invert(1);
   opacity: 1;
-}
-.vaxler-link:hover .vaxler-by,
-.vaxler-link:focus-visible .vaxler-by {
-  color: color-mix(in srgb, var(--cream) 85%, transparent);
 }
 
 /* ---------- Una sola pantalla: izquierda info+mapa, derecha formulario ---------- */
@@ -817,6 +807,13 @@ h1, h2, h3, h4 {
 .pmap-frame {
   height: clamp(20rem, 52vw, 30rem);
   padding: 0; /* el mapa llena el marco; el inset gold lo da .img-frame */
+}
+
+/* Marco del mapa: aísla el stacking context para que los z-index internos
+   de Leaflet (panes ~400, controles ~1000) NO se pinten por encima del
+   header sticky (z-50) al scrollear. */
+.pmap-frame {
+  isolation: isolate;
 }
 
 /* El div que Leaflet rellena: ocupa todo el marco. */
