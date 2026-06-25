@@ -742,9 +742,19 @@ h1, h2, h3, h4 {
   border-radius: 1rem;
   padding: clamp(1.4rem, 3vw, 2.3rem);
 }
-.contact-form-panel .contact-form-title { text-align: left; }
-.contact-form-panel .contact-actions { align-items: stretch; margin-top: 1.4rem; }
-.contact-form-panel .contact-submit { width: 100%; justify-content: center; }
+.contact-form-panel .contact-form-title {
+  display: block;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+/* Campos apilados en una sola columna → sin desalineaciones ni etiquetas
+   partidas en dos líneas; el formulario respira y queda parejo. */
+.contact-form-panel .contact-grid { grid-template-columns: 1fr; gap: 1.15rem; }
+.contact-form-panel .contact-field { gap: 0.55rem; }
+.contact-form-panel .contact-label { white-space: nowrap; }
+.contact-form-panel .contact-actions { align-items: stretch; margin-top: 1.6rem; gap: 0.7rem; }
+.contact-form-panel .contact-submit { width: 100%; justify-content: center; padding-block: 0.9rem; }
+.contact-form-panel .contact-note { text-align: center; }
 
 .contact-tagline { opacity: 0.85; }
 
